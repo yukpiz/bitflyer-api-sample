@@ -47,15 +47,12 @@ def main(channels):
             # Handle new message stored in message.message
             # メインの処理はここで書きます
             # 登録したチャンネルからメッセージ(価格の変化など)がくるたび、この関数が呼ばれます
-            current_best_ask = int(message.message['mid_price'])
-            if self.prev_best_ask > current_best_ask:
-                screen.cprint(RED, BLACK, "[mid_price] %s\n" % message.message['mid_price'])
-            elif self.prev_best_ask < current_best_ask:
-                screen.cprint(GREEN, BLACK, "[mid_price] %s\n" % message.message['mid_price'])
-            else:
-                screen.cprint(LIGHT_GRAY, BLACK, "[mid_price] %s\n" % message.message['mid_price'])
-            screen.reset()
-            self.prev_best_ask = current_best_ask
+            for excution in message.message:
+                if excution['side'] == 'BUY':
+                    screen.cprint(GREEN, BLACK, "%s : %s\n" % (excution['side'], excution['size']))
+                else:
+                    screen.cprint(RED, BLACK, "%s: %s\n" % (excution['side'], excution['size']))
+                screen.reset()
 
     listener = BitflyerSubscriberCallback()
     pubnub.add_listener(listener)
@@ -63,7 +60,7 @@ def main(channels):
 
 if __name__ == '__main__':
     channels = [
-        'lightning_board_FX_BTC_JPY',
+        'lightning_executions_FX_BTC_JPY',
     ]
     main(channels)
     pubnub.start()
