@@ -19,6 +19,7 @@ RED = 1
 LIGHT_GRAY = 7
 LIGHT_CYAN = 11
 screen.cprint(LIGHT_CYAN, 0, "<======== Bitflyer FX-BTC/JPY ========>")
+screen.reset()
 
 from tornado import gen
 
@@ -48,11 +49,19 @@ def main(channels):
             # メインの処理はここで書きます
             # 登録したチャンネルからメッセージ(価格の変化など)がくるたび、この関数が呼ばれます
             for excution in message.message:
+                size = float(excution['size'])
                 if excution['side'] == 'BUY':
-                    screen.cprint(GREEN, BLACK, "%s : %s\n" % (excution['side'], excution['size']))
+                    if size > 30:
+                        screen.cprint(BLACK, GREEN, "%s : %s" % (excution['side'], size))
+                    else:
+                        screen.cprint(GREEN, BLACK, "%s : %s" % (excution['side'], size))
                 else:
-                    screen.cprint(RED, BLACK, "%s: %s\n" % (excution['side'], excution['size']))
+                    if size > 30:
+                        screen.cprint(LIGHT_GRAY, RED, "%s: %s" % (excution['side'], size))
+                    else:
+                        screen.cprint(RED, BLACK, "%s: %s" % (excution['side'], size))
                 screen.reset()
+                print("")
 
     listener = BitflyerSubscriberCallback()
     pubnub.add_listener(listener)
